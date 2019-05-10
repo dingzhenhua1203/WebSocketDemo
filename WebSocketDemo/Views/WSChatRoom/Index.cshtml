@@ -1,0 +1,273 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="editApp">
+    <el-form ref="ruleForm" :model="form" label-width="100px" :rules="rules">
+        <el-form-item label="用户名" prop="user">
+            <el-input size='small' v-model="form.MABTotalMoney"></el-input>
+        </el-form-item>
+
+        <el-form-item label="游戏类型" prop="MABGameTypeId">
+            <el-select size="small" placeholder="请选择" v-model="form.MABGameTypeId">
+                <el-option v-for="item in Config.MABGameTypeOption"
+                           :key="item.value"
+                           :label="item.label"
+                           :value="item.value">
+                </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="红包分类" prop="MABClassifyId">
+            <el-select size="small" placeholder="请选择" v-model="form.MABClassifyId">
+                <el-option v-for="item in Config.MABClassifyOption"
+                           :key="item.value"
+                           :label="item.label"
+                           :value="item.value">
+                </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="红包总金额" prop="MABTotalMoney">
+            <el-input size='small' v-model="form.MABTotalMoney"></el-input>
+        </el-form-item>
+        <el-form-item label="红包总数量" prop="MABTotalNum">
+            <el-input type="number" size='small' v-model="form.MABTotalNum"></el-input>
+        </el-form-item>
+        <el-form-item label="每日红包总额" prop="MABDayMoney">
+            <el-input size='small' v-model="form.MABDayMoney"></el-input>
+        </el-form-item>
+        <el-form-item label="每日红包总数" prop="MABDayNum">
+            <el-input type="number" size='small' v-model="form.MABDayNum"></el-input>
+        </el-form-item>
+        <el-form-item label="领取类型" prop="MABReceiveTypeId">
+            <el-select size="small" placeholder="请选择" v-model="form.MABReceiveTypeId">
+                <el-option v-for="item in Config.MABReceiveTypeOption"
+                           :key="item.value"
+                           :label="item.label"
+                           :value="item.value">
+                </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="限制领取秒数" prop="MABLimitSecond">
+            <el-input type="number" size='small' v-model="form.MABLimitSecond"></el-input>
+        </el-form-item>
+        <el-form-item label="限制类型">
+            <el-select size="small" placeholder="请选择" v-model="form.MABLimitType">
+                <el-option v-for="item in Config.MABLimitTypeOption"
+                           :key="item.value"
+                           :label="item.label"
+                           :value="item.value">
+                </el-option>
+            </el-select>
+        </el-form-item>
+        <el-form-item label="限制次数" prop="MABLimitTimes" v-if="form.MABLimitType!=0">
+            <el-input type="number" size='small' v-model="form.MABLimitTimes"></el-input>
+        </el-form-item>
+        <el-form-item label="备注说明" prop="MABRemarks">
+            <el-input size='small' v-model="form.MABRemarks"></el-input>
+        </el-form-item>
+        <el-form-item label="是否有区间" prop="MABIsInterval">
+            <template>
+                <el-radio v-model="form.MABIsInterval" label="1">有</el-radio>
+                <el-radio v-model="form.MABIsInterval" label="2">无</el-radio>
+            </template>
+        </el-form-item>
+        <el-form-item label="状态">
+            <template>
+                <el-radio v-model="form.MABRowStatue" label="1">有效</el-radio>
+                <el-radio v-model="form.MABRowStatue" label="2">无效</el-radio>
+            </template>
+        </el-form-item>
+        <el-form-item>
+            <el-button type="primary" size="small" :loading="saveLoading" v-on:click="OnSubmit('ruleForm')">{{saveText}}</el-button>
+        </el-form-item>
+    </el-form>
+</div>
+
+<script>
+    var vm = new Vue({
+        el: "#editApp",
+        data: function () {
+            return {
+                saveLoading: false,
+                form: {
+                    MABRowStatue: '1',
+                    MABLimitType: '0',
+                },
+                Config: {
+                    MABGameTypeOption: {},
+                    MABClassifyOption: {},
+                    MABReceiveTypeOption: {},
+                    MABLimitTypeOption: [{
+                        value: '0',
+                        label: '不限制'
+                    }, {
+                        value: '1',
+                        label: '每天'
+                    }, {
+                        value: '2',
+                        label: '每周'
+                    }, {
+                        value: '3',
+                        label: '每月'
+                    }, {
+                        value: '4',
+                        label: '每年'
+                    }],
+                },
+                rules: {
+                    MABGameTypeId: [
+                        { required: true, message: '请选择游戏类型' },
+                    ],
+                    MABClassifyId: [
+                        { required: true, message: '请选择红包分类' },
+                    ],
+                    MABTotalMoney: [
+                        { required: true, message: '请输入红包总金额' },
+                    ],
+                    MABTotalNum: [
+                        { required: true, message: '请输入红包总数量' },
+                    ],
+                    MABDayNum: [
+                        { required: true, message: '请输入每日红包总数' },
+                    ],
+                    MABDayMoney: [
+                        { required: true, message: '请输入每日红包总额' },
+                    ],
+                    MABReceiveTypeId: [
+                        { required: true, message: '请选择领取类型' },
+                    ],
+                    MABIsInterval: [
+                        { required: true, message: '请选择是否有区间' },
+                    ],
+                }
+            };
+
+        },
+        computed: {
+            saveText: function () {
+                return this.saveLoading ? '保存中...' : '保存';
+            },
+            addShow: function () {
+                const id = this.$utils.getUrlKey("id");
+                if (id > 0) {
+                    return false;
+                }
+                return true;
+            },
+        },
+        methods: {
+            checkData() {
+                var that = this;
+                var reg = new RegExp("^\\d+(\\.\\d{0,2})?$");
+
+                if (!reg.test(that.form.MABTotalMoney)) {
+                    that.$message.error('红包总金额,要求最多两位小数');
+                    return false;
+                }
+                if (!reg.test(that.form.MABDayMoney)) {
+                    that.$message.error('每日红包总额,要求最多两位小数');
+                    return false;
+                }
+                return true;
+            },
+            GetMoneyAwardBaseDetail(id) {
+                const that = this;
+                const url = `/MoneyAwardBase/GetMoneyAwardBaseDetail?id=${id}`;
+                ajaxCall.Get(that, url, {}, function (that, data) {
+                    that.form = data.Body;
+                }, {});
+            },
+            PostToServer() {
+                const that = this;
+                const url = `/MoneyAwardBase/EditMoneyAwardBase`;
+                ajaxCall.Post(that, url, that.form
+                    , function (that, data) {
+                        if (data.ResultCode == 1) {
+                            that.alert.Success("保存成功");
+                            that.saveLoading = false;
+                            //if (type == 0) {
+                            that.$utils.closeDialog();
+                            //} else {
+
+                            //}
+                        }
+                        else {
+                            that.alert.Error(data.ResultMsg);
+                            that.saveLoading = false;
+                        }
+                    }, function (that) {
+                        that.saveLoading = false;
+                        that.alert.Error("保存失败");
+                    });
+            },
+            OnSubmit(formName) {
+                const that = this;
+                if (!that.checkData()) {
+                    that.saveLoading = false;
+                    return;
+                }
+                that.form.MABGameTypeName = that.GetSelectName(that.Config.MABGameTypeOption, that.form.MABGameTypeId);
+                that.form.MABClassifyName = that.GetSelectName(that.Config.MABClassifyOption, that.form.MABClassifyId);
+                that.form.MABReceiveTypeName = that.GetSelectName(that.Config.MABReceiveTypeOption, that.form.MABReceiveTypeId);
+                if (this.saveLoading) {
+                    that.alert.Error("正在保存中,请耐心等待。。。");
+                    return;
+                }
+                that.saveLoading = true;
+                console.log('submit!');
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        that.PostToServer();
+                    } else {
+                        that.saveLoading = false;
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+
+            },
+            ResetForm(formName) {
+                this.$refs[formName].resetFields();
+            },
+            initDicData() {
+                //游戏类型
+                ajaxCall.GetDicData(this, 201, function (page, data) {
+                    if (data && data.ResultCode == 1) {
+                        page.Config.MABGameTypeOption = data.Body;
+                    }
+                });
+                //红包分类
+                ajaxCall.GetDicData(this, 202, function (page, data) {
+                    if (data && data.ResultCode == 1) {
+                        page.Config.MABClassifyOption = data.Body;
+                    }
+                });
+                //领取类型
+                ajaxCall.GetDicData(this, 203, function (page, data) {
+                    if (data && data.ResultCode == 1) {
+                        page.Config.MABReceiveTypeOption = data.Body;
+                    }
+                });
+            },
+            GetSelectName(data, id) {
+                var item = data.find((item) => {
+                    return item.value == id
+                })
+                return item ? item.label : '';
+            },
+        },
+        mounted: function () {
+            const id = this.$utils.getUrlKey("id");
+            if (id > 0) {
+                this.GetMoneyAwardBaseDetail(id);
+            }
+            this.initDicData();
+        }
+
+    });
+
+
+</script>
+

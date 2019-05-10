@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="~/Content/css/element.css" asp-append-version="true" />
+    <script src="~/Content/scripts/utils/vue.js" asp-append-version="true"></script>
+    <script src="~/Content/scripts/utils/element.js" asp-append-version="true"></script>
+    <script src="~/Content/scripts/utils/ajax.utils.js" asp-append-version="true"></script>
+    <script src="~/Content/scripts/utils/utils.js" asp-append-version="true"></script>
+    @RenderSection("Header", false)
+    <style>
+        .span-long-text {
+            line-height: 30px;
+            text-align: center;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body style="margin-left:16px;">
+    <div style="height: 15px;width: 100%"></div>
+    @RenderBody()
+
+    @RenderSection("Footer", false)
+</body>
+</html>

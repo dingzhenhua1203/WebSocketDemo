@@ -1,0 +1,133 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <title></title>
+    <link rel="stylesheet" href="~/Content/css/element.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Content/css/index.css" asp-append-version="true" />
+    <script src="~/Content/scripts/utils/vue.js" asp-append-version="true"></script>
+    <script src="~/Content/scripts/utils/element.js" asp-append-version="true"></script>
+    <style>
+        .table {
+            padding: 10px 0px;
+            margin: 0px;
+        }
+
+        .tr {
+            width: 600px;
+        }
+
+            .tr .td-label {
+                display: inline-table;
+                width: 80px;
+                text-align: right;
+            }
+
+            .tr .td-box {
+                display: inline-flex;
+                width: 300px;
+            }
+
+        .button {
+            margin-left: 5px;
+        }
+    </style>
+    <script src="../Scripts/jquery-3.3.1.min.js"></script>
+</head>
+<body>
+    <div class="table">
+        <h4 style="margin-left:10px;">Socket通信</h4>
+            <div class="tr">
+                <div class="td-label">用户名 ：</div>
+                <div class="td-box">
+                    <input id="user" type="text" />
+                    <input id="conn" class="button" type="button" value="登录" />
+                    <input id="close"  class="button" type="button" value="登出" />
+                    <span id="tips" style="color:red;"></span>
+                </div>
+            </div>
+            <div class="tr">
+                <div class="td-label"> 内容：</div>
+                <div class="td-box">
+                    <input id="content" type="text" />
+                    <input id="send"  class="button" type="button" value="发送" />
+                </div>
+            </div>
+            <div class="tr">
+                <div class="td-label">目的用户： </div>
+                <div class="td-box">
+                    <input id="to" type="text" />
+                </div>
+            </div>
+        </div>
+        <div id="msg"></div>
+</body>
+</html>
+<script>
+    var ws;
+    var heartCheck = {
+        timeout: 60000,//60ms
+        timeoutObj: null,
+        reset: function () {
+            clearTimeout(this.timeoutObj);
+            this.start();
+        },
+        start: function () {
+            this.timeoutObj = setTimeout(function () {
+                ws.send("ping");
+            }, this.timeout)
+        }
+    };
+    var reconnect = function () {
+        timeout: 60000;//60ms
+        i = 0;
+        if (ws.readyState == WebSocket.CLOSED) {
+            while (i < 3) {
+            setTimeout(function () {
+                ws = new WebSocket('ws://10.101.72.7:8015/api/WebSocketHandler/Get?user=' + $("#user").val());
+                }, this.timeout);
+                i++
+            }
+        }
+    };
+    $().ready(function () {
+        $('#conn').click(function () {
+            ws = new WebSocket('ws://10.101.72.7:8015/api/WebSocketHandler/Get?user=' + $("#user").val());
+            $('#msg').append('<p>正在连接</p>');
+
+            ws.onopen = function () {
+                $('#msg').append('<p>已经连接</p>');
+                heartCheck.start();
+            }
+            ws.onmessage = function (evt) {
+                $('#msg').append('<p>' + evt.data + '</p>');
+                heartCheck.reset();
+            }
+            ws.onerror = function (evt) {
+                $('#msg').append('<p>' + JSON.stringify(evt) + '</p>');
+            }
+            ws.onclose = function () {
+                $('#msg').append('<p>已经关闭</p>');
+            }
+        });
+
+        $('#close').click(function () {
+            ws.close();
+        });
+
+        $('#send').click(function () {
+            if ($("#to").val() == "") {
+                $('#tips').text("please write send to who ?");
+                return;
+            }
+            if (ws.readyState == WebSocket.OPEN) {
+                ws.send($("#to").val() + "|" + $('#content').val());
+            }
+            else {
+                $('#tips').text('您已经登出！');
+            }
+        });
+    });
+
+</script>
